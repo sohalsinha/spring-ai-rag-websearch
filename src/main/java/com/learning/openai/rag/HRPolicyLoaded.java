@@ -17,7 +17,7 @@ public class HRPolicyLoaded {
 
     private final VectorStore vectorStore;
 
-    @Value("classpath:HR_POLICY_MANUAL.pdf")
+    @Value("classpath:HR_POLICY_MANUAL_v2.pdf")
     Resource policyFile;
 
     public HRPolicyLoaded(VectorStore vectorStore) {
