@@ -23,11 +23,15 @@ import static org.springframework.ai.chat.memory.ChatMemory.CONVERSATION_ID;
 public class RAGController {
 
     private final ChatClient chatClient;
+    private final ChatClient webSearchChatClient;
     private final VectorStore vectorStore;
 
-    private RAGController(@Qualifier("chatMemoryChatClient") ChatClient chatClient, VectorStore vectorStore) {
+    private RAGController(@Qualifier("chatMemoryChatClient") ChatClient chatClient,
+            @Qualifier("webSearchRAGChatClient") ChatClient webSearchChatClient
+            , VectorStore vectorStore) {
         this.chatClient = chatClient;
         this.vectorStore = vectorStore;
+        this.webSearchChatClient = webSearchChatClient;
     }
 
 
@@ -132,6 +136,20 @@ public class RAGController {
                 /*.system(
                         promptSystemSpec -> promptSystemSpec.text(hrSystemTemplate).param("documents",similarcontext))
                 */.advisors(a -> a.param(CONVERSATION_ID, username))
+                .user(message)
+                .call().content();
+
+        return  ResponseEntity.ok(answer);
+
+    }
+
+    //With RAG Changes in Config
+    @GetMapping("/web-search/chat")
+    public ResponseEntity<String> webSearchChat(@RequestHeader("username") String username,
+                                               @RequestParam("message") String message) {
+
+        String answer = webSearchChatClient.prompt()
+                .advisors(a -> a.param(CONVERSATION_ID, username))
                 .user(message)
                 .call().content();
 
